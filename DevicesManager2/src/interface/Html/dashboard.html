@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dash.css">
+    <link rel="stylesheet" href="styles2.css">
+    <link rel="stylesheet" href="styles3.css">
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="menu.html">Accueil</a></li>
+            <li><a href="Apareils.html">Appareils</a></li>
+            <li><a href="capteurs.html">Capteurs</a></li>
+            <li><a href="actuateur.html">Actuateurs</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>     
+
+        </ul>
+    </nav>
+
+    <section class="dashboard-content">
+        <!-- Contenu du dashboard -->
+        <h2>Contenu du Dashboard</h2>
+        <!-- Inclure les graphiques ici -->
+        <div class="chart-container">
+            <!-- Emplacement pour le graphique de température -->
+            <iframe src="Chart.html" width="100%" height="400px" frameborder="0"></iframe>
+        </div>
+        <div class="chart-container">
+            <!-- Emplacement pour le graphique d'humidité -->
+            <iframe src="chart2.html" width="100%" height="400px" frameborder="0"></iframe>
+        </div>
+    </section>
+
+    <!-- Scripts JS si nécessaire -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphique de Température</title>
+    <!-- Inclure Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 80%; margin: 20px auto;">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+
+    <script>
+        // Données de température (échantillon)
+
+
+        // Extraire les valeurs et les timestamps
+        const valeurs = temperatureData.map(data => data.valeur);
+        const timestamps = temperatureData.map(data => data.timestamp);
+
+        // Créer un graphique de ligne avec Chart.js
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+        const temperatureChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timestamps, // Utiliser les timestamps comme labels
+                datasets: [{
+                    label: 'Température (°C)',
+                    data: valeurs, // Utiliser les valeurs comme données du graphique
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Évolution de la température'
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            parser: 'h[h]mm[min]ss[s]', // Parser pour les timestamps
+                            tooltipFormat: 'h:mm:ss', // Format d'affichage dans les tooltips
+                            unit: 'second'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Temps'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Température (°C)'
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+</body>
+</html>

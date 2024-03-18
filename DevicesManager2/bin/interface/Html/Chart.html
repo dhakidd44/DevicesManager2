@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphique de Température</title>
+    <!-- Inclure Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 80%; margin: 20px auto;">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+
+    <script>
+        // Données de température (échantillon)
+        const temperatureData = [
+            {
+                "valeur": 23.6,
+                "id": 1624,
+                "type_capteur_id": 1,
+                "timestamp": "5h52mn50s"
+            },
+            {
+                "valeur": 23.1,
+                "id": 1626,
+                "type_capteur_id": 1,
+                "timestamp": "5h53mn11s"
+            },
+            {
+                "valeur": 21.4,
+                "id": 1628,
+                "type_capteur_id": 1,
+                "timestamp": "5h53mn35s"
+            },
+            {
+                "valeur": 22.5,
+                "id": 1630,
+                "type_capteur_id": 1,
+                "timestamp": "5h54mn0s"
+            },
+            {
+                "valeur": 21.5,
+                "id": 1632,
+                "type_capteur_id": 1,
+                "timestamp": "5h54mn22s"
+            },
+            {
+                "valeur": 23.4,
+                "id": 1634,
+                "type_capteur_id": 1,
+                "timestamp": "5h54mn46s"
+            },
+            {
+                "valeur": 22.4,
+                "id": 1636,
+                "type_capteur_id": 1,
+                "timestamp": "5h55mn11s"
+            }
+        ];
+
+        // Extraire les valeurs et les timestamps
+        const valeurs = temperatureData.map(data => data.valeur);
+        const timestamps = temperatureData.map(data => data.timestamp);
+
+        // Créer un graphique de ligne avec Chart.js
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+        const temperatureChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timestamps, // Utiliser les timestamps comme labels
+                datasets: [{
+                    label: 'Température (°C)',
+                    data: valeurs, // Utiliser les valeurs comme données du graphique
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Évolution de la température'
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            parser: 'h[h]mm[min]ss[s]', // Parser pour les timestamps
+                            tooltipFormat: 'h:mm:ss', // Format d'affichage dans les tooltips
+                            unit: 'second'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Temps'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Température (°C)'
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+</body>
+</html>

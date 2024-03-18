@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Actuateurs</title>
+    <link rel="stylesheet" href="styles3.css"> <!-- Lien vers le fichier CSS -->
+    <link rel="stylesheet" href="styles2.css"> <!-- Lien vers le fichier CSS -->
+</head>
+<body>
+    <header>
+        <h1>Gestion des Actuateurs</h1>
+
+        <nav>
+            <ul>
+                <li><a href="menu.html">Accueil</a></li>
+                <li><a href="Apareils.html">Appareils</a></li>
+                <li><a href="capteurs.html">Capteurs</a></li>
+                <li><a href="actuateur.html">Actuateurs</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>     
+
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Section pour afficher les données des actuateurs -->
+    <section class="actuateurs">
+        <h2>Liste des Actuateurs</h2>
+        <table id="actuateurs-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Modèle</th>
+                    <th>État</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les données des actuateurs seront ajoutées ici -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Formulaire pour ajouter un actuateur -->
+    <section class="ajout-actuateur" style="margin-top: 20px;">
+        <h2>Ajouter un Actuateur</h2>
+        <form id="ajout-form-actuateur">
+            <label for="nom-actuateur">Nom :</label>
+            <input type="text" id="nom-actuateur" name="nom-actuateur" required><br><br>
+            
+            <label for="modele-actuateur">Modèle :</label>
+            <input type="text" id="modele-actuateur" name="modele-actuateur" required><br><br>
+
+            <label for="etat-actuateur">État :</label>
+            <select id="etat-actuateur" name="etat-actuateur" required>
+                <option value="1">Actif</option>
+                <option value="0">Inactif</option>
+            </select><br><br>
+
+            <label for="appareil-actuateur">Appareil :</label>
+            <select id="appareil-actuateur" name="appareil-actuateur" required>
+                <!-- Les options d'appareils seront ajoutées ici -->
+            </select><br><br>
+            
+            <input type="submit" value="Ajouter">
+            <button type="button" onclick="goBack()">Retour</button>
+        </form>
+    </section>
+
+    <!-- Script pour récupérer et afficher les actuateurs -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const actuateursTable = document.getElementById("actuateurs-table");
+            const ajoutForm = document.getElementById("ajout-form-actuateur");
+
+            // Fonction pour récupérer et afficher les actuateurs depuis l'API
+            function populateActuateursTable() {
+                fetch("http://localhost:8000/api/actuateurs")
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(actuateur => {
+                            const row = actuateursTable.insertRow();
+                            row.innerHTML = `
+                                <td>${actuateur.nom}</td>
+                                <td>${actuateur.modele}</td>
+                                <td>${actuateur.etat === 1 ? "Actif" : "Inactif"}</td>
+                                <td><button onclick="deleteActuateur(${actuateur.id})">Supprimer</button></td>
+                            `;
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la récupération des actuateurs :", error);
+                    });
+            }
+
+            // Soumission du formulaire pour ajouter un actuateur
+            ajoutForm.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const formData = new FormData(ajoutForm);
+                const newActuateur = {
+                    nom: formData.get("nom-actuateur"),
+                    modele: formData.get("modele-actuateur"),
+                    etat: parseInt(formData.get("etat-actuateur"))
+                };
+
+                // Envoi des données à l'API pour l'ajout
+                fetch("http://localhost:8000/api/actuateurs", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newActuateur)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Nouvel actuateur ajouté :", data);
+                    // Actualiser la liste des actuateurs après l'ajout
+                    populateActuateursTable();
+                    ajoutForm.reset(); // Réinitialiser le formulaire après l'envoi réussi
+                })
+                .catch(error => {
+                    console.error("Erreur lors de l'ajout de l'actuateur :", error);
+                });
+            });
+
+            // Écouter le submit du formulaire
+        document.getElementById("ajout-form-actuateur").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            // Récupérer les valeurs du formulaire
+            const nomActuateur = document.getElementById("nom-actuateur").value;
+            const modeleActuateur = document.getElementById("modele-actuateur").value;
+            const etatActuateur = document.getElementById("etat-actuateur").value;
+            const appareilActuateur = document.getElementById("appareil-actuateur").value;
+            
+            // Créer l'objet à envoyer
+            const actuateurData = {
+                nom: nomActuateur,
+                modele: modeleActuateur,
+                etat: etatActuateur,
+                appareil_id: appareilActuateur // Envoyer l'ID de l'appareil
+            };
+
+            // Envoyer les données à l'API (ici à titre d'exemple affiché dans la console)
+            console.log("Données à envoyer :", actuateurData);});
+
+
+
+            // Récupérer la liste des appareils depuis votre API
+        fetch("http://localhost:8000/api/appareils")
+            .then(response => response.json())
+            .then(data => {
+                const appareilSelect = document.getElementById("appareil-actuateur");
+                data.forEach(appareil => {
+                    const option = document.createElement("option");
+                    option.text = appareil.nom;
+                    option.value = appareil.id;
+                    appareilSelect.add(option);
+                });
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des appareils :", error);
+            });
+
+
+    function closeForm() {
+        var formSection = document.querySelector(".ajout-actuateur");
+        formSection.style.display = "none";
+    }
+
+            // Appel initial pour afficher les actuateurs au chargement de la page
+            populateActuateursTable();
+        });
+
+
+
+// Fonction pour supprimer un actuateur
+function deleteActuateur(actuateurId) {
+                if (confirm(`Voulez-vous vraiment supprimer l'actuateur avec l'ID ${actuateurId} ?`)) {
+                    fetch(`http://localhost:8000/api/actuateurs/${actuateurId}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Actualiser la liste des actuateurs après la suppression
+                            populateActuateursTable();
+                        } else {
+                            throw new Error("Erreur lors de la suppression de l'actuateur.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la suppression de l'actuateur :", error);
+                    });
+                }
+            }
+
+            // Récupérer la liste des appareils depuis votre API
+            fetch("http://localhost:8000/api/client/actuateurs")
+                .then(response => response.json())
+                .then(data => {
+                    const appareilSelect = document.getElementById("appareil-actuateur");
+                    data.forEach(appareil => {
+                        const option = document.createElement("option");
+                        option.text = appareil.nom;
+                        option.value = appareil.id;
+                        appareilSelect.add(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la récupération des appareils :", error);
+                });
+
+
+        // Fonction pour revenir à la page précédente
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

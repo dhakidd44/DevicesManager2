@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphique d'Humidité</title>
+    <!-- Inclure Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 80%; margin: 20px auto;">
+        <canvas id="humidityChart"></canvas>
+    </div>
+
+    <script>
+        // Données d'humidité
+
+
+        // Extraire les valeurs et les timestamps
+        const valeurs = humidityData.map(data => data.valeur);
+        const timestamps = humidityData.map(data => data.timestamp);
+
+        // Créer un graphique de ligne avec Chart.js
+        const ctx = document.getElementById('humidityChart').getContext('2d');
+        const humidityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timestamps, // Utiliser les timestamps comme labels
+                datasets: [{
+                    label: 'Humidité (%)',
+                    data: valeurs, // Utiliser les valeurs comme données du graphique
+                    borderColor: 'green',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Évolution de l\'humidité'
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            parser: 'H[h]mm[min]ss[s]', // Parser pour les timestamps
+                            tooltipFormat: 'HH:mm:ss', // Format d'affichage dans les tooltips
+                            unit: 'second'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Temps'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Humidité (%)'
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+</body>
+</html>

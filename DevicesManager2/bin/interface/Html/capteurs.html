@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Capteurs</title>
+    <link rel="stylesheet" href="styles3.css"> <!-- Lien vers le fichier CSS -->
+    <link rel="stylesheet" href="styles2.css"> <!-- Lien vers le fichier CSS -->
+</head>
+<body>
+    <header>
+        <h1>Gestion des Capteurs</h1>
+        <nav>
+            <ul>
+                <li><a href="menu.html">Accueil</a></li>
+                <li><a href="Apareils.html">Appareils</a></li>
+                <li><a href="capteurs.html">Capteurs</a></li>
+                <li><a href="actuateur.html">Actuateurs</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>     
+
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Section pour afficher les données des capteurs -->
+    <section class="capteurs">
+        <h2>Liste des Capteurs</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Modèle</th>
+                </tr>
+            </thead>
+            <tbody id="capteurs-table">
+                <!-- Les données des capteurs seront ajoutées ici -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Bouton pour afficher/masquer le formulaire d'ajout -->
+    <button id="btn-ajouter-capteur">Ajouter Capteur</button>
+
+    <!-- Section pour ajouter un nouveau capteur (initialement cachée) -->
+    <section class="ajout-capteur" style="display: none;">
+        <h2>Ajouter un Nouveau Capteur</h2>
+        <form id="ajout-form-capteur">
+            <label for="nom-capteur">Nom :</label>
+            <input type="text" id="nom-capteur" name="nom-capteur" required><br><br>
+            
+            <label for="modele-capteur">Modèle :</label>
+            <input type="text" id="modele-capteur" name="modele-capteur"><br><br>
+
+            <label for="type-capteur">Type :</label>
+            <input type="text" id="type-capteur" name="type-capteur"><br><br>
+
+            <label for="objet-id">Objet Appartenant :</label>
+            <select id="objet-id" name="objet-id" required>
+                <!-- Les options d'appareils seront ajoutées ici -->
+            </select><br><br>
+            
+            <input type="submit" value="Ajouter">
+            <button type="button" onclick="closeFormCapteur()">Annuler</button>
+        </form>
+    </section>
+
+
+    <script src="capteurs.js"></script> <!-- Lien vers le fichier JavaScript pour les capteurs -->
+    <script>
+        // Fonction pour afficher le formulaire d'ajout de capteur
+        document.getElementById("btn-ajouter-capteur").addEventListener("click", function() {
+            var formSection = document.querySelector(".ajout-capteur");
+            formSection.style.display = "block";
+        });
+
+        // Fonction pour masquer le formulaire d'ajout de capteur
+        function closeFormCapteur() {
+            var formSection = document.querySelector(".ajout-capteur");
+            formSection.style.display = "none";
+        }
+
+        // Fonction pour revenir à la page précédente
+        function goBack() {
+            window.history.back();
+        }
+
+        // Fonction pour récupérer et afficher les capteurs
+        function populateCapteursTable() {
+            const capteursTable = document.getElementById("capteurs-table");
+            capteursTable.innerHTML = ""; 
+
+            const capteurs = [
+                {
+                    "id": "6",
+                    "nom": "Capteur6",
+                    "modele": "Modele",
+                    "etat":"1"
+                },
+                {
+                    "id": "7",
+                    "nom": "Capteur7",
+                    "modele": "Modele7",
+                    "etat":"1"
+                },
+                {
+                    "id": "8",
+                    "nom": "Capteur8",
+                    "modele": "Modele8",
+                "etat":"1"
+                },
+                {
+                    "id": "9",
+                    "nom": "Capteur9",
+                    "modele": "Modele9",
+                    "etat":"1"
+                },
+                {
+                    "id": "10",
+                    "nom": "Capteur10",
+                    "modele": "Modele10",
+                    "etat":"0"
+                }
+            ];
+
+            capteurs.forEach(capteur => {
+                const row = capteursTable.insertRow();
+                row.innerHTML = `
+                    <td>${capteur.nom}</td>
+                    <td>${capteur.modele}<td>
+                `;
+            });
+
+
+
+            
+        }
+
+
+        // Récupérer la liste des appareils depuis votre API
+        fetch("http://localhost:8000/api/appareils")
+            .then(response => response.json())
+            .then(data => {
+                const objetSelect = document.getElementById("objet-id");
+                data.forEach(appareil => {
+                    const option = document.createElement("option");
+                    option.text = appareil.nom;
+                    option.value = appareil.id;
+                    objetSelect.add(option);
+                });
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des appareils :", error);
+            });
+
+        // Écouter le submit du formulaire
+        document.getElementById("ajout-form-capteur").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            // Récupérer les valeurs du formulaire
+            const nomCapteur = document.getElementById("nom-capteur").value;
+            const modeleCapteur = document.getElementById("modele-capteur").value;
+            const typeCapteur = document.getElementById("type-capteur").value;
+            const objetId = document.getElementById("objet-id").value;
+            
+            // Créer l'objet à envoyer
+            const capteurData = {
+                nom: nomCapteur,
+                modele: modeleCapteur,
+                type: typeCapteur,
+                objet_id: objetId 
+            };
+
+            // Envoyer les données à l'API (ici à titre d'exemple affiché dans la console)
+            console.log("Données à envoyer :", capteurData);
+
+        
+        });
+
+        // Gestionnaire d'événement pour le bouton "Supprimer"
+    const btnSupprimer = row.querySelector('.btn-supprimer');
+    btnSupprimer.addEventListener('click', () => {
+        const appareilId = btnSupprimer.getAttribute('data-id');
+        if (confirm(`Voulez-vous vraiment supprimer le capteurl avec l'ID ${appareilId} ?`)) {
+            supprimerAppareil(appareilId);
+        }
+    });
+    function supprimerAppareil(appareilId) {
+        const url = `http://localhost:8000/api/capteurs/${appareilId}`;
+    
+        fetch(url, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erreur lors de la suppression de du capteur.');
+        })
+        .then(data => {
+            console.log('capteur supprimé avec succès :', data);
+            refreshAppareilsTable(); // Actualiser la liste des appareils après la suppression
+        })
+        .catch(error => {
+            console.error('Erreur lors de la suppression du capteur :', error);
+            // Gérer les erreurs, par exemple afficher un message à l'utilisateur
+        });
+    }
+// Fonction pour supprimer un capteur
+function supprimerCapteur(capteurId) {
+            const url = `http://localhost:8000/api/capteurs/${capteurId}`;
+
+            fetch(url, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Erreur lors de la suppression du capteur.');
+            })
+            .then(data => {
+                console.log('Capteur supprimé avec succès :', data);
+                populateCapteursTable(); // Actualiser la liste des capteurs après la suppression
+            })
+            .catch(error => {
+                console.error('Erreur lors de la suppression du capteur :', error);
+                // Gérer les erreurs, par exemple afficher un message à l'utilisateur
+            });
+        }
+
+        // Appel initial pour afficher les capteurs au chargement de la page
+        populateCapteursTable();
+    </script>
+</body>
+</html>

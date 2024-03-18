@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Appareils</title>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="styles3.css"> <!-- Lien vers le fichier CSS -->
+    <link rel="stylesheet" href="styles2.css"> <!-- Lien vers le fichier CSS -->
+</head>
+<body>
+    <header>
+        <h1>Gestion des Appareils</h1>
+        <nav>
+            <ul>
+                <li><a href="menu.html">Accueil</a></li>
+                <li><a href="Apareils.html">Appareils</a></li>
+                <li><a href="capteurs.html">Capteurs</a></li>
+                <li><a href="actuateur.html">Actuateurs</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>     
+            </ul>
+        </nav>
+    </header>
+ 
+    <!-- Section pour afficher les données des appareils -->
+    <section class="appareils">
+        <h2>Liste des Appareils</h2>
+        
+        <button id="btn-ajouter-appareil">Ajouter Appareil</button>
+        <div class="table-wrapper">
+            <table id="appareils-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th>Catégorie</th>
+                        <th>Adresse IP</th>
+                        <th>Localisation</th>
+                        <th>État</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les données des appareils seront ajoutées ici via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Section pour ajouter un nouvel appareil (initialement cachée) -->
+    <section class="ajout-appareil" style="display: none;">
+        <h2>Ajouter un Nouvel Appareil</h2>
+        <form id="ajout-form">
+            <label for="nom">Nom :</label>
+            <input type="text" id="nom" name="nom" required><br><br>
+            
+            <label for="type">Type :</label>
+            <input type="text" id="type" name="type"><br><br>
+            
+            <label for="categorie">Catégorie :</label>
+            <input type="text" id="categorie" name="categorie"><br><br>
+            
+            <label for="adresse_ip">Adresse IP :</label>
+            <input type="text" id="adresse_ip" name="adresse_ip"><br><br>
+            
+            <label for="localisation">Localisation :</label>
+            <input type="text" id="localisation" name="localisation"><br><br>
+
+            <label for="etat">État :</label>
+            <select id="etat" name="etat">
+                <option value="1">Actif</option>
+                <option value="0">Inactif</option>
+            </select><br><br>
+            
+            <button type="submit" id="btn-ajouter">Ajouter</button>
+            <button type="button" onclick="closeForm()">Annuler</button>
+        </form>
+    </section>
+
+    <!-- Lien vers le fichier JavaScript -->
+    <script src="appareils.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("ajout-form");
+            const appareilsTable = document.getElementById("appareils-table");
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(form);
+                const jsonObject = {};
+                formData.forEach(function (value, key) {
+                    jsonObject[key] = value;
+                });
+
+                const url = "http://localhost:8000/api/appareils"; // URL de votre API appareils
+
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(jsonObject)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Réponse du serveur :", data);
+                    form.reset(); // Réinitialiser le formulaire après l'envoi réussi
+                    refreshAppareilsTable(); // Actualiser la liste des appareils après l'ajout
+                })
+                .catch(error => {
+                    console.error("Erreur lors de l'envoi des données :", error);
+                    // Gérer les erreurs, par exemple afficher un message à l'utilisateur
+                });
+            });
+
+            // Fonction pour afficher le formulaire d'ajout
+            document.getElementById("btn-ajouter-appareil").addEventListener("click", function() {
+                var formSection = document.querySelector(".ajout-appareil");
+                formSection.style.display = "block";
+            });
+
+            // Fonction pour masquer le formulaire d'ajout
+            function closeForm() {
+                var formSection = document.querySelector(".ajout-appareil");
+                formSection.style.display = "none";
+            }
+
+            // Fonction pour actualiser la liste des appareils
+            function refreshAppareilsTable() {
+                fetch("http://localhost:8000/api/appareils")
+                    .then(response => response.json())
+                    .then(data => {
+                        appareilsTable.innerHTML = ""; // Effacer le contenu existant de la table
+                        populateAppareilsTable(data); // Remplir la table avec les données reçues
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la récupération des données des appareils :", error);
+                    });
+            }
+
+            // Fonction pour remplir la table des appareils avec les données reçues
+            function populateAppareilsTable(appareils) {
+                appareils.forEach(appareil => {
+                    const row = appareilsTable.insertRow();
+                    row.innerHTML = `
+                        <td>${appareil.nom}</td>
+                        <td>${appareil.type}</td>
+                        <td>${appareil.categorie}</td>
+                        <td>${appareil.adresse_ip}</td>
+                        <td>${appareil.localisation}</td>
+                        <td>${appareil.etat === 1 ? "Actif" : "Inactif"}</td>
+                        <td><button onclick="deleteAppareil(${appareil.id})">Supprimer</button></td>
+                    `;
+                });
+            }
+
+            // Fonction pour supprimer un appareil
+            function deleteAppareil(id) {
+                const url = `http://localhost:8000/api/appareils/${id}`; // URL de votre API pour supprimer un appareil
+
+                fetch(url, {
+                    method: "DELETE",
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`Appareil avec l'ID ${id} supprimé.`);
+                        refreshAppareilsTable(); // Actualiser la liste des appareils après la suppression
+                    } else {
+                        console.error(`Erreur lors de la suppression de l'appareil avec l'ID ${id}`);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la suppression de l'appareil :", error);
+                });
+            }
+
+            // Appeler la fonction pour charger la liste des appareils au chargement de la page
+            refreshAppareilsTable();
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
